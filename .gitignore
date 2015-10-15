@@ -72,6 +72,10 @@ api_config.js
 ApiConfig.java
 global.json
 
+# Parse files
+.parse.local
+.parse.project
+
 # Cached copy of blogger feed
 blogger_posts.json
 
