@@ -11,7 +11,7 @@
 
  	Parse.Cloud.define("sample_cloud_function", sampleCloudFunction.main);
 
-* then, you would call it with
+ * then, you would call it with
 
 	Parse.Cloud.run('sample_cloud_function', params, {
 	    success: function(object) {
@@ -22,9 +22,9 @@
 	    }
 	});
 
-* Notes:
-* 
-* - Because of Cloud Code limitations, put arguments into params object as such:
+ * Notes:
+ * 
+ * - Because of Cloud Code limitations, put arguments into params object as such:
 
 	params = {
 		arg0: value0,
@@ -33,11 +33,11 @@
 		argN: valueN
 	};
 
-* - Response will be a JSON object containing the repsonse code and a data object
-* 	if the method is supposed to return a value. Otherwise the data object will
-*	be undefined. There will always be a response code. You may find out what the
-*	response code means in cloud/error_codes.js.
-*/
+ * - Response will be a JSON object containing the repsonse code and a data object
+ * 	if the method is supposed to return a value. Otherwise the data object will
+ *	be undefined. There will always be a response code. You may find out what the
+ *	response code means in cloud/error_codes.js.
+ */
 
 /********************************/
 /********** DO NOT USE **********/
