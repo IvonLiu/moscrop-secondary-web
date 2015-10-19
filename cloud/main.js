@@ -1,5 +1,5 @@
 /**
- * This is the complete list of Clouc Code functions
+ * This is the complete list of Cloud Code functions
  * the backend supports right now. Think of this as
  * the header file. However, since this is Cloud Code,
  * the way you call methods is slightly different than
