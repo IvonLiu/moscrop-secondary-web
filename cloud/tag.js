@@ -10,7 +10,7 @@ exports.addUser = addUser;
 exports.removeUser = removeUser;
 exports.getUsers = getUsers;
 
-var ResponseCode = require('cloud/error_codes.js');
+var ResponseCodes = require('cloud/response_codes.js');
 var Category = Parse.Object.extend("Categories");
 
 function create_cloud(request, response) {
@@ -19,11 +19,17 @@ function create_cloud(request, response) {
 	var id_category = request.params.id_category;
 	var icon_img = request.params.icon_img;
 	create(name, id_author, id_category, icon_img, {
-		success: function(object) {
-			response.success(ResponseCode.OK);
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});
 }
@@ -34,11 +40,17 @@ function update_cloud(request, response) {
 	var id_category = request.params.id_category;
 	var icon_img = request.params.icon_img;
 	update(name, id_author, id_category, icon_img, {
-		success: function(object) {
-			response.success(ResponseCode.OK);
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});
 }
@@ -47,11 +59,17 @@ function addUser_cloud(request, response) {
 	var username = request.params.username;
 	var tag = request.params.tag;
 	addUser(username, tag, {
-		success: function(object) {
-			response.success(ResponseCode.OK);
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});
 }
@@ -60,11 +78,17 @@ function removeUser_cloud(request, response) {
 	var username = request.params.username;
 	var tag = request.params.tag;
 	removeUser(username, tag, {
-		success: function(object) {
-			response.success(ResponseCode.OK);
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});	
 }
@@ -72,11 +96,17 @@ function removeUser_cloud(request, response) {
 function getUsers_cloud(request, response) {
 	var tag = request.params.tag;
 	getUsers(tag, {
-		success: function(users) {
-			response.success(users);
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});
 }
@@ -88,12 +118,12 @@ function create(name, id_author, id_category, icon_img, callbacks) {
 	var completeCount = 0;
 
     if (!name) {
-        callbacks.error(ResponseCode.MISSING_NAME);
+        callbacks.error(ResponseCodes.MISSING_NAME, "Creating a tag requires a tag name");
         return;
     }
 
     if (!icon_img) {
-        callbacks.error(ResponseCode.MISSING_ICON_URL);
+        callbacks.error(ResponseCodes.MISSING_ICON_URL, "Creating a tag requries an icon URL");
         return;
     }
 
@@ -124,18 +154,18 @@ function create(name, id_author, id_category, icon_img, callbacks) {
 		                        success: function(updatedContributorRole) {
     		                    	completeCount++;
 			                    	if (completeCount == 2) {
-			                        	callbacks.success(ResponseCode.OK);
+			                        	callbacks.success(ResponseCodes.OK, null);
 			                        	return;
 			                    	}
 		                        },
 		                        error: function(object, error) {
-		                            callbacks.error("Error saving contributor role after adding " + roleName + " as subrole: " + error.code + ", " + error.message);
+		                            callbacks.error(error.code, error.message);
 		                            return;
 		                        }
 		                    });	
 	            		},
 	            		error: function(object, error) {
-	            			callbacks.error(error);
+	            			callbacks.error(error.code, error.message);
 	            			return;
 	            		}
 	            	});
@@ -157,25 +187,25 @@ function create(name, id_author, id_category, icon_img, callbacks) {
 		                    success: function(category) {
 		                    	completeCount++;
 		                    	if (completeCount == 2) {
-		                        	callbacks.success(ResponseCode.OK);
+		                        	callbacks.success(ResponseCodes.OK, null);
 		                        	return;
 		                    	}
 		                    },
 		                    error: function(category, error) {
-		                        callbacks.error("Create category (" + name + ") failed: " + error.code + ", " + error.message);
+		                        callbacks.error(error.code, error.message);
 		                        return;
 		                    }
 		                }
 		            );
 	            },
 	            error: function(object, error) {
-	                callbacks.error("Error adding new role " + name + ": " + error.code + ", " + error.message);
+	                callbacks.error(error.code, error.message);
 	                return;
 	            }
 	        });
     	},
     	error: function(object, error) {
-    		callbacks.error(error);
+    		callbacks.error(error.code, error.message);
     		return;
     	}
     }); 
@@ -184,12 +214,12 @@ function create(name, id_author, id_category, icon_img, callbacks) {
 function update(name, id_author, id_category, icon_img, callbacks) {
 
 	if (!name) {
-        callbacks.error(ResponseCode.MISSING_NAME);
+        callbacks.error(ResponseCodes.MISSING_NAME, "Creating a tag requires a tag name");
         return;
     }
 
     if (!icon_img) {
-        callbacks.error(ResponseCode.MISSING_ICON_URL);
+        callbacks.error(ResponseCodes.MISSING_ICON_URL, "Creating a tag requries an icon URL");
         return;
     }
 
@@ -205,22 +235,26 @@ function update(name, id_author, id_category, icon_img, callbacks) {
     query.equalTo("name", name);
     query.first({
     	success: function(category) {
+    		if (!category) {
+    			callbacks.error(ResponseCodes.CATEGORY_NOT_FOUND, "Cannot find category " + name);
+    			return;
+    		}
     		category.set("id_author", id_author);
     		category.set("id_category", id_category);
     		category.set("icon_img", icon_img);
     		category.save(null, {
     			success: function(category) {
-    				callbacks.success(ResponseCode.OK);
+    				callbacks.success(ResponseCodes.OK, null);
     				return;
     			},
     			error: function(object, error) {
-    				callbacks.error(error);
+    				callbacks.error(error.code, error.message);
     				return;
     			}
     		});
     	},
     	error: function(object, error) {
-    		callbacks.error(error);
+    		callbacks.error(error.code, error.message);
     		return;
     	}
     });
@@ -232,39 +266,47 @@ function addUser(username, tag, callbacks) {
 	userQuery.equalTo("username", username);
 	userQuery.first({
 		success: function(user) {
+			if (!user) {
+    			callbacks.error(ResponseCodes.USER_NOT_FOUND, "Cannot find user " + username);
+    			return;
+    		}
 			var roleQuery = new Parse.Query(Parse.Role);
 			roleQuery.equalTo("name", tag);
 			roleQuery.first({
 				success: function(role) {
+					if (!role) {
+    					callbacks.error(ResponseCodes.USER_NOT_FOUND, "Cannot find role " + tag);
+    					return;
+    				}
 					user.relation("roles").add(role);
-					user.save({
+					user.save(null, {
 						success: function(object) {
 							role.getUsers().add(user);
 							role.save({
 								success: function(object) {
-									callbacks.success(ResponseCode.OK);
+									callbacks.success(ResponseCodes.OK, null);
 									return;
 								},
 								error: function(object, error) {
-									callbacks.error(error);
+									callbacks.error(error.code, error.message);
 									return;
 								}
 							});
 						},
 						error: function(object, error) {
-							callbacks.error(error);
+							callbacks.error(error.code, error.message);
 							return;
 						}
 					});
 				},
 				error: function(object, error) {
-					callbacks.error(error);
+					callbacks.error(error.code, error.message);
 					return;
 				}
 			});
 		},
 		error: function(object, error) {
-			callbacks.error(error);
+			callbacks.error(error.code, error.message);
 			return;
 		}
 	});
@@ -275,22 +317,30 @@ function removeUser(username, tag, callbacks) {
 	userQuery.equalTo("username", username);
 	userQuery.first({
 		success: function(user) {
+			if (!user) {
+    			callbacks.error(ResponseCodes.USER_NOT_FOUND, "Cannot find user " + username);
+    			return;
+    		}
 			var roleQuery = new Parse.Query(Parse.Role);
 			roleQuery.equalTo("name", tag);
 			roleQuery.first({
 				success: function(role) {
+					if (!role) {
+    					callbacks.error(ResponseCodes.USER_NOT_FOUND, "Cannot find role " + tag);
+    					return;
+    				}					
 					var completeCount = 0;
 					user.relation("roles").remove(role);
-					user.save({
+					user.save(null, {
 						success: function(object) {
 							completeCount++;
 							if (completeCount == 2) {
-								callbacks.success(ResponseCode.OK);
+								callbacks.success(ResponseCodes.OK, null);
 								return;
 							}
 						},
 						error: function(object, error) {
-							callbacks.error(error);
+							callbacks.error(error.code, error.message);
 							return;
 						}
 					});
@@ -299,24 +349,24 @@ function removeUser(username, tag, callbacks) {
 						success: function(object) {
 							completeCount++;
 							if (completeCount == 2) {
-								callbacks.success(ResponseCode.OK);
+								callbacks.success(ResponseCodes.OK, null);
 								return;
 							}
 						},
 						error: function(object, error) {
-							callbacks.error(error);
+							callbacks.error(error.code, error.message);
 							return;
 						}
 					});
 				},
 				error: function(object, error) {
-					callbacks.error(error);
+					callbacks.error(error.code, error.message);
 					return;
 				}
 			});
 		},
 		error: function(object, error) {
-			callbacks.error(error);
+			callbacks.error(error.code, error.message);
 			return;
 		}
 	});
@@ -327,20 +377,24 @@ function getUsers(tag, callbacks) {
 	roleQuery.equalTo("name", tag);
 	roleQuery.first({
 		success: function(role) {
+			if (!role) {
+				callbacks.error(ResponseCodes.USER_NOT_FOUND, "Cannot find role " + tag);
+				return;
+			}			
 			var relationsQuery = role.getUsers().query();
 			relationsQuery.find({
 				success: function(users) {
-					callbacks.success(users);
+					callbacks.success(ResponseCodes.OK, users);
 					return;
 				},
 				error: function(object, error) {
-					callbacks.error(error);
+					callbacks.error(error.code, error.message);
 					return;
 				}
 			});
 		},
 		error: function(object, error) {
-			callbacks.error(error);
+			callbacks.error(error.code, error.message);
 			return;
 		}
  	});

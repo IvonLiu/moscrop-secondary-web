@@ -1,0 +1,191 @@
+<html>
+
+    <head>
+        <title>Moscrop Secondary | Admin</title>
+
+        <!--Import materialize.css-->
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <!--Let browser know website is optimized for mobile-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <!-- Import Parse -->
+        <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+    </head>
+
+    <body>
+
+        <ul>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="Tag_create()">Tag_create</a></li>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="Tag_update()">Tag_update</a></li>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="Tag_addUser()">Tag_addUser</a></li>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="Tag_removeUser()">Tag_removeUser</a></li>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="Tag_getUsers()">Tag_getUsers</a></li>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="User_addTag()">User_addTag</a></li>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="User_removeTag()">User_removeTag</a></li>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="User_getTags()">User_getTags</a></li>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="User_setPermissionLevel()">User_setPermissionLevel</a></li>
+            <li style="padding:4px"><a class="waves-effect waves-light btn" onclick="User_getPermissionLevel()">User_getPermissionLevel</a></li>
+        </ul>
+
+        <script>
+
+            Parse.initialize("TtFxol5uKm6piqaomYYvaTtezhRJQFZFRadc9qit", "smiduKJqXsJXvEnYj5nUSBFxxTXMpHiZZibVVyLx");
+            var currentUser = Parse.User.current();
+
+            function Tag_create() {
+                var params = {
+                    name: "Tag42",
+                    id_author: "Bar-thur",
+                    id_category: "Foo-d",
+                    icon_img: "https://raw.githubusercontent.com/IvonLiu/moscrop-secondary-app/master/moscropOnline/clubs/math_club.png"
+                };
+                Parse.Cloud.run('Tag_create', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+            function Tag_update() {
+                var params = {
+                    name: "Tag42",
+                    id_author: "Bar-thur-update",
+                    id_category: "Foo-d-update",
+                    icon_img: "https://raw.githubusercontent.com/IvonLiu/moscrop-secondary-app/master/moscropOnline/clubs/math_club.png"
+                };
+                Parse.Cloud.run('Tag_update', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+            function Tag_addUser() {
+                var params = {
+                    username: "FooBar",
+                    tag: "Tag42"
+                };
+                Parse.Cloud.run('Tag_addUser', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+            function Tag_removeUser() {
+                var params = {
+                    username: "FooBar",
+                    tag: "Tag42"
+                };
+                Parse.Cloud.run('Tag_removeUser', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+            function Tag_getUsers() {
+                var params = {
+                    tag: "Math Club"
+                };
+                Parse.Cloud.run('Tag_getUsers', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+            function User_addTag() {
+                var params = {
+                    username: "FooBar",
+                    tag: "Tag42"
+                };
+                Parse.Cloud.run('User_addTag', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+            function User_removeTag() {
+                var params = {
+                    username: "FooBar",
+                    tag: "Tag42"
+                };
+                Parse.Cloud.run('User_removeTag', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+            function User_getTags() {
+                var params = { 
+                    username: "IvonLiu"
+                };
+                Parse.Cloud.run('User_getTags', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+            function User_setPermissionLevel() {
+                var params = {
+                    username: "FooBar",
+                    level: "moderator"
+                };
+                Parse.Cloud.run('User_setPermissionLevel', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+            function User_getPermissionLevel() {
+                var params = {
+                    username: "FooBar"
+                };
+                Parse.Cloud.run('User_getPermissionLevel', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });
+            }
+
+        </script>
+    </body>
+
+</html>

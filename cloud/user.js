@@ -4,18 +4,24 @@ exports.getTags_cloud = getTags_cloud;
 exports.setPermissionLevel_cloud = setPermissionLevel_cloud;
 exports.getPermissionLevel_cloud = getPermissionLevel_cloud;
 
-var ResponseCode = require('cloud/error_codes.js');
+var ResponseCodes = require('cloud/response_codes.js');
 var Tag = require('cloud/tag.js');
 
 function addTag_cloud(request, response) {
 	var username = request.params.username;
 	var tag = request.params.tag;
 	addTag(username, tag, {
-		success: function(object) {
-			response.success(ResponseCode.OK);
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});
 }
@@ -24,23 +30,35 @@ function removeTag_cloud(request, response) {
 	var username = request.params.username;
 	var tag = request.params.tag;
 	removeTag(username, tag, {
-		success: function(object) {
-			response.success(ResponseCode.OK);
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});
 }
 
 function getTags_cloud(request, response) {
 	var username = request.params.username;
-	getTags(username, tag, {
-		success: function(tags) {
-			response.success(tags);
+	getTags(username, {
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});
 }
@@ -49,24 +67,35 @@ function setPermissionLevel_cloud(request, response) {
 	var username = request.params.username;
 	var level = request.params.level;
 	setPermissionLevel(username, level, {
-		success: function(object) {
-			response.success(ResponseCode.OK);
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});
 }
 
 function getPermissionLevel_cloud(request, response) {
 	var username = request.params.username;
-	var level = request.params.level;
-	getPermissionLevel(username, level, {
-		success: function(level) {
-			response.success(level);
+	getPermissionLevel(username, {
+		success: function(responseCode, object) {
+			response.success({
+				code: responseCode,
+				data: object
+			});
 		},
-		error: function(error) {
-			response.error(error);
+		error: function(responseCode, errorMsg) {
+			response./*error*/success({
+				code: responseCode,
+				data: errorMsg
+			});
 		}
 	});
 }
@@ -86,21 +115,25 @@ function getTags(username, callbacks) {
 	userQuery.equalTo("username", username);
 	userQuery.first({
 		success: function(user) {
+			if (!user) {
+    			callbacks.error(ResponseCodes.USER_NOT_FOUND, "Cannot find user " + username);
+    			return;
+    		}			
 			var relationsQuery = user.relation("roles").query();
 			relationsQuery.notContainedIn("name", ["admin", "moderator", "contributor"]);
 			relationsQuery.find({
 				success: function(roles) {
-					callbacks.success(roles);
+					callbacks.success(ResponseCodes.OK, roles);
 					return;
 				},
 				error: function(object, error) {
-					callbacks.error(error);
+					callbacks.error(error.code, error.message);
 					return;
 				}
 			});
 		},
 		error: function(object, error) {
-			callbacks.error(error);
+			callbacks.error(error.code, error.message);
 			return;
 		}
 	});
@@ -112,44 +145,48 @@ function setPermissionLevel(username, level, callbacks) {
 		var roleQuery = new Parse.Query(Parse.Role);
 		roleQuery.equalTo("name", level);
 		roleQuery.first({
-			success: function(role) {
+			success: function(role) {				
 				var userQuery = new Parse.Query(Parse.User);
 				userQuery.equalTo("username", username);
 				userQuery.first({
 					success: function(user) {
+						if (!user) {
+			    			callbacks.error(ResponseCodes.USER_NOT_FOUND, "Cannot find user " + username);
+			    			return;
+			    		}						
 						var completeCount = 0;
 						role.getUsers().add(user);
 						role.save({
 							success: function(object) {
 								completeCount++;
 								if (completeCount == 2) {
-									callbacks.success(ResponseCode.OK);
+									callbacks.success(ResponseCodes.OK, null);
 								}
 							},
 							error: function(object, error) {
-								callbacks.error(error);
+								callbacks.error(error.code, error.message);
 							}
 						});
 						user.set("permissionLevel", level);
-						user.save({
+						user.save(null, {
 							success: function(object) {
 								completeCount++;
 								if (completeCount == 2) {
-									callbacks.success(ResponseCode.OK);
+									callbacks.success(ResponseCodes.OK, null);
 								}
 							},
 							error: function(object, error) {
-								callbacks.error(error);
+								callbacks.error(error.code, error.message);
 							}
 						});
 					},
 					error: function(object, error) {
-						callbacks.error(error);
+						callbacks.error(error.code, error.message);
 					}
 				});
 			},
 			error: function(object, error) {
-				callbacks.error(error);
+				callbacks.error(error.code, error.message);
 			}
 		});
 
@@ -166,17 +203,21 @@ function setPermissionLevel(username, level, callbacks) {
 						userQuery.equalTo("username", username);
 						userQuery.first({
 							success: function(user) {
+								if (!user) {
+					    			callbacks.error(ResponseCodes.USER_NOT_FOUND, "Cannot find user " + username);
+					    			return;
+					    		}									
 								var completeCount = 0;
 								adminRole.getUsers().remove(user);
 								adminRole.save({
 									success: function(object) {
 										completeCount++;
 										if (completeCount == 3) {
-											callbacks.success(ResponseCode.OK);
+											callbacks.success(ResponseCodes.OK, null);
 										}
 									},
 									error: function(object, error) {
-										callbacks.error(error);
+										callbacks.error(error.code, error.message);
 									}
 								});
 								modRole.getUsers().remove(user);
@@ -184,38 +225,38 @@ function setPermissionLevel(username, level, callbacks) {
 									success: function(object) {
 										completeCount++;
 										if (completeCount == 3) {
-											callbacks.success(ResponseCode.OK);
+											callbacks.success(ResponseCodes.OK, null);
 										}
 									},
 									error: function(object, error) {
-										callbacks.error(error);
+										callbacks.error(error.code, error.message);
 									}
 								});
 								user.set("permissionLevel", "regular");
-								user.save({
+								user.save(null, {
 									success: function(object) {
 										completeCount++;
 										if (completeCount == 3) {
-											callbacks.success(ResponseCode.OK);
+											callbacks.success(ResponseCodes.OK, null);
 										}
 									},
 									error: function(object, error) {
-										callbacks.error(error);
+										callbacks.error(error.code, error.message);
 									}
 								});
 							},
 							error: function(object, error) {
-								callbacks.error(error);
+								callbacks.error(error.code, error.message);
 							}
 						});
 					},
 					error: function(object, error) {
-						callbacks.error(error);
+						callbacks.error(error.code, error.message);
 					}
 				});
 			},
 			error: function(object, error) {
-				callbacks.error(error);
+				callbacks.error(error.code, error.message);
 			}
 		});
 
@@ -227,10 +268,18 @@ function getPermissionLevel(username, callbacks) {
 	userQuery.equalTo("username", username);
 	userQuery.first({
 		success: function(user) {
-			callbacks.success(user.get("permissionLevel"));
+			if (!user) {
+    			callbacks.error(ResponseCodes.USER_NOT_FOUND, "Cannot find user " + username);
+    			return;
+    		}				
+    		var permissionLevel = user.get("permissionLevel");
+    		if (!permissionLevel) {
+    			permissionLevel = "regular";
+    		}
+			callbacks.success(ResponseCodes.OK, permissionLevel);
 		},
 		error: function(object, error) {
-			callbacks.error(error);
+			callbacks.error(error.code, error.message);
 		}
 	});
 }
