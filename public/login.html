@@ -15,9 +15,8 @@
 
         <!-- Import Parse -->
         <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
-    </head>
 
-    <body>
+    <body onkeydown="return done()">
         <!-- Containing "card" -->
         <div class="container centered" id="container">
 
@@ -54,8 +53,8 @@
                 </div>
 
                 <!-- Login button -->
-                <div class="card-action" style="float:right; margin-top:-23%">
-                    <p class="btn-large waves-effect waves-light red" onclick="done()">Login</p>
+                <div id="login" class="card-action" style="float:right; margin-top:-23%">
+                    <p id="login" class="btn-large waves-effect waves-light red" onclick="done()">Login</p>
                     <!-- <div class="fixed-action-btn" style="bottom: 42px;">
                         <a class="btn-floating btn-large waves-effect waves-light red" onclick="done()"> -->
                             <!-- <i class="material-icons">done</i> -->
