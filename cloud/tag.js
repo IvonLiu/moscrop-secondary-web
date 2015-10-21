@@ -262,6 +262,9 @@ function update(name, id_author, id_category, icon_img, callbacks) {
 
 function addUser(username, tag, callbacks) {
 	
+    // Use master key to bypass ACL
+    Parse.Cloud.useMasterKey();
+
 	var userQuery = new Parse.Query(Parse.User);
 	userQuery.equalTo("username", username);
 	userQuery.first({
@@ -313,6 +316,10 @@ function addUser(username, tag, callbacks) {
 }
 
 function removeUser(username, tag, callbacks) {
+
+    // Use master key to bypass ACL
+    Parse.Cloud.useMasterKey();
+
 	var userQuery = new Parse.Query(Parse.User);
 	userQuery.equalTo("username", username);
 	userQuery.first({

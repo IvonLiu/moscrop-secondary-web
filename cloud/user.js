@@ -140,6 +140,10 @@ function getTags(username, callbacks) {
 }
 
 function setPermissionLevel(username, level, callbacks) {
+
+    // Use master key to bypass ACL
+    Parse.Cloud.useMasterKey();
+	
 	if (level == "administrator" || level == "moderator") {
 
 		var roleQuery = new Parse.Query(Parse.Role);

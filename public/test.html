@@ -100,7 +100,7 @@
 
             function Tag_getUsers() {
                 var params = {
-                    tag: "Math Club"
+                    tag: "Tag42"
                 };
                 Parse.Cloud.run('Tag_getUsers', params, {
                     success: function(response) {
@@ -144,7 +144,7 @@
 
             function User_getTags() {
                 var params = { 
-                    username: "IvonLiu"
+                    username: "FooBar"
                 };
                 Parse.Cloud.run('User_getTags', params, {
                     success: function(response) {
