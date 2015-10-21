@@ -186,77 +186,16 @@
                 var username = document.getElementById("contributor_username_field").value;
                 var roleName = document.getElementById("contributor_group_field").value;
 
-                addUserToRole(username, roleName);
-            }
-
-            function addUserToRole(username, roleName) {
-
-                var roleQuery = new Parse.Query(Parse.Role);
-                roleQuery.equalTo("name", roleName);
-                roleQuery.first({
-                    success: function(role) {
-                        if (!role) {
-                            roleQuery.equalTo("name", "moderator");
-                            roleQuery.first().then(function(modRole) {
-                                var roleACL = new Parse.ACL();
-                                roleACL.setPublicReadAccess(true);
-                                roleACL.setRoleWriteAccess(modRole, true);
-                                role = new Parse.Role(roleName, roleACL);
-                                role.getRoles().add(modRole);
-                                role.save({
-                                    success: function(newRole) {
-                                        roleQuery.equalTo("name", "contributor");
-                                        roleQuery.first().then(function(contributorRole) {
-                                            contributorRole.getRoles().add(newRole);
-                                            contributorRole.save({
-                                                success: function(updatedContributorRole) {
-                                                    console.log("Successfully added new role: " + newRole.getName());
-                                                    addUserToRole(username, roleName);
-                                                    return;
-                                                },
-                                                error: function(object, error) {
-                                                    alert("Error saving contributor role after adding " + roleName + " as subrole: " + error.code + ", " + error.message);
-                                                }
-                                            })
-                                        });
-                                    },
-                                    error: function(object, error) {
-                                        alert("Error adding new role " + roleName + ": " + error.code + ", " + error.message);
-                                    }
-                                });
-                            });
-                        } else {
-                            var userQuery = new Parse.Query(Parse.User);
-                            userQuery.equalTo("username", username);
-                            userQuery.first({
-                                success: function(user) {
-                                    if (!user) {
-                                        alert("User '" + username + "' does not exist!");
-                                        return;
-                                    }
-                                    role.getUsers().add(user);
-                                    role.save({
-                                        success: function(updatedRole) {
-                                            console.log("Added " + username + " to " + roleName);
-                                            if (roleName == "administrator") {
-                                                document.getElementById("admin_username_field").value = "";
-                                            } else if (roleName == "moderator") {
-                                                document.getElementById("mod_username_field").value = "";
-                                            } else {
-                                                document.getElementById("contributor_username_field").value = "";
-                                                document.getElementById("contributor_group_field").value = "";
-                                            }
-                                        }
-                                    });
-                                },
-                                error: function(object, error) {
-                                    alert("Error getting user " + username + ": " + error.code + ", " + error.message);
-                                }
-                            });
-                        }
+                params = {
+                    username: username,
+                    tag: roleName
+                };
+                Parse.Cloud.run("Tag_addUser", params, {
+                    success: function(response) {
+                        alert("Success");
                     },
-                    error: function(object, error) {
-                        alert("Error getting " + roleName + " role: " + error.code + ", " + error.message);
+                    error: function(error) {
+
                     }
                 });
             }

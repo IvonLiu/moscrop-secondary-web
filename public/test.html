@@ -85,8 +85,8 @@
 
             function Tag_removeUser() {
                 var params = {
-                    username: "FooBar",
-                    tag: "Tag42"
+                    username: "IvonLiu",
+                    tag: "Math Club"
                 };
                 Parse.Cloud.run('Tag_removeUser', params, {
                     success: function(response) {
@@ -100,7 +100,7 @@
 
             function Tag_getUsers() {
                 var params = {
-                    tag: "Tag42"
+                    tag: "Math Club"
                 };
                 Parse.Cloud.run('Tag_getUsers', params, {
                     success: function(response) {
@@ -144,7 +144,7 @@
 
             function User_getTags() {
                 var params = { 
-                    username: "FooBar"
+                    username: "IvonLiu"
                 };
                 Parse.Cloud.run('User_getTags', params, {
                     success: function(response) {

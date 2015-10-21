@@ -215,6 +215,10 @@
 
         <div id="title_field"></div>
 
+        <div>
+            <ul id="category_selector" style="display:inline"></ul>
+        </div>
+
         <div id="editor"></div>
         
         <div class="fixed-action-btn" style="bottom: 42px; right: 42px;">
@@ -231,6 +235,7 @@
             Parse.initialize("TtFxol5uKm6piqaomYYvaTtezhRJQFZFRadc9qit", "smiduKJqXsJXvEnYj5nUSBFxxTXMpHiZZibVVyLx");
 
             var userRoles = undefined;
+            var postAsTag = undefined;
 
             var currentUser = Parse.User.current();
             if (currentUser) {
@@ -239,7 +244,20 @@
                 $(".dropdown-button").dropdown({ hover: false });
                 document.getElementById("username").innerHTML = currentUser.getUsername();
 
-                var roleQuery = new Parse.Query(Parse.Role);
+                params = {
+                    username: currentUser.getUsername(),
+                };
+                Parse.Cloud.run("User_getTags", params, {
+                    success: function(response) {
+                        var tags = response.data;
+                        postAsTag = tags[0];
+                    },
+                    error: function(error) {
+
+                    }
+                });
+
+                /*var roleQuery = new Parse.Query(Parse.Role);
                 roleQuery.equalTo("name", "contributor");
                 roleQuery.first({
                     success: function(contributorRole) {
@@ -276,7 +294,7 @@
                     error: function(object, error) {
                         alert("Error getting privileged role: " + error.code + ", " + error.message);
                     }
-                });
+                });*/
 
             } else {
                 // show the signup or login page
@@ -299,46 +317,55 @@
             });
 
             function submitPost() {
-                
-                var BlogPost = Parse.Object.extend("BlogPosts");
-                var post = new BlogPost();
+                var Post = Parse.Object.extend("Posts");
+                var roleQuery = new Parse.Query(Parse.Role);
+                roleQuery.equalTo("name", "moderator");
+                roleQuery.first().then(function(modRole) {
+                    var categoryName = "Math Club";
+                    var query = new Parse.Query("Categories");
+                    query.equalTo("name", categoryName);
+                    query.first({
+                        success: function(category) {
+                            var bloggerId = "0";
+                            var createdBy = currentUser;
+                            var title = cleanUpTitle(titleField.getText());
+                            var published = new Date();
+                            var updated = published;
+                            var content = editor.getHTML();
+                            var bgImage = getBgImage(content);
 
-                var bloggerId = "0";    // No bloggerId for posts created with Parse
-                var createdBy = currentUser;
-                var title = cleanUpTitle(titleField.getText());
-                var published = new Date();
-                var updated = published;
-                var category = userRoles[0].getName();
-                var content = editor.getHTML();
-                var icon = "https://raw.githubusercontent.com/IvonLiu/moscrop-secondary-app/master/moscropOnline/clubs/moscrop_app.png";
-                var bgImage = getBgImage(content);
+                            var post = new Post();
 
-                var acl = new Parse.ACL();
-                acl.setPublicReadAccess(true);
-                acl.setRoleWriteAccess(userRoles[0], true);
-                post.setACL(acl);
+                            var acl = new Parse.ACL();
+                            acl.setPublicReadAccess(true);
+                            acl.setRoleWriteAccess(modRole, true);
+                            post.setACL(acl);
 
-                post.save(
-                    {
-                        bloggerId: bloggerId,
-                        createdBy: createdBy,
-                        title: title,
-                        published: published,
-                        updated: updated,
-                        category: category,
-                        content: content,
-                        icon: icon,
-                        bgImage: bgImage
-                    }, {
-                        success: function(savedParsePost) {
-                            //alert("Successfully submitted");
-                            window.location.href = "index.html";
+                            post.save(
+                                {
+                                    bloggerId: bloggerId,
+                                    createdBy: createdBy,
+                                    title: title,
+                                    published: published,
+                                    updated: updated,
+                                    category: category,
+                                    content: content,
+                                    bgImage: bgImage
+                                }, {
+                                    success: function(savedParsePost) {
+                                        alert("Success");
+                                    },
+                                    error: function(parsePost, error) {
+                                        alert("Error");
+                                    }
+                                }
+                            );      
                         },
-                        error: function(parsePost, error) {
-                            alert("Save parse post (parseId=" + parsePost.id + ") failed: " + error.code + ", " + error.message);
+                        error: function(category, error) {
+                            alert("error");
                         }
-                    }
-                );
+                    });
+                });
             }
 
             function cleanUpTitle(title) {
