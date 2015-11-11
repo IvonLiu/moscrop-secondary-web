@@ -1,0 +1,286 @@
+<html>
+
+    <head>
+        <title>Moscrop Secondary | User Manager</title>
+
+        <!--Import materialize.css-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <link type="text/css" rel="stylesheet" href="css/common.css"/>
+        <link type="text/css" rel="stylesheet" href="css/usermanager.css"/>
+
+        <!--Let browser know website is optimized for mobile-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <!-- Import Parse -->
+        <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+    </head>
+
+    <body bgcolor="#eee">
+
+        <div id="navbar-container">
+            <ul id="accountDropdownItems" class="dropdown-content">
+                <li><a href="settings.html">Settings</a></li>
+                <!--<li class="divider"></li>-->
+                <li><a onclick="logout()">Logout</a></li>
+            </ul>
+            <div class="navbar-fixed" style="height:72px">
+                <nav>
+                    <div class="nav-wrapper" style="background-color:#4784c0; padding-left:16px; padding-right:16px">
+                        <a href="index.html" class="brand-logo">Moscrop Secondary</a>
+                        <div id="toolbarActions" class="hidden">
+                            <ul id="loggedInActions" class="right hide-on-med-and-down">
+                                <li id="username" style="background-color:#4784c0; margin-right:16px"></li>
+                                <li id="submitButton"><a href="submit.html"><i class="material-icons">create</i></a></li>
+                                <li id="requestButton"><a href="#" onclick="openRequestModal()"><i class="material-icons">create</i></a></li>
+                                <li id="adminButton"><a href="administration.html"><i class="material-icons">lock</i></a></li>
+                                <li id="accountDropdown"><a class="dropdown-button" href="#!" data-activates="accountDropdownItems"><i class="material-icons">account_circle</i></a></li>
+                            </ul>
+                            <ul id="loggedOutActions" class="right hide-on-med-and-down">
+                                <li id="loginButton"><a href="login.html">Login</a></li>
+                                <li id="registerButton"><a href="register.html">Register</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <div id="request_access_modal" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                    <h4 id="update_tag_modal_title">Request Access</h4>
+                    <div class="row">
+                        <form id="available_categories" class="col s12" action="#"></form>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12" onkeydown="if (event.keyCode == 13) addClub()">
+                            <i class="material-icons prefix">add</i>
+                            <input id="request_new_club" type="text" class="validate">
+                            <label for="request_new_club">Request new club</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a class="modal-action waves-effect waves-green btn-flat" onclick="sendAccessRequest()">Request</a>
+                    <a class="modal-action modal-close waves-effect waves-green btn-flat" href="#!">Cancel</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- User grid container -->
+        <div class="container">
+            <div id="user_list" class="row"></div>
+        </div>
+
+        <div id="update_user_modal" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                <h4 id="update_user_modal_title">Update User</h4>
+                <div class="row">
+                    <form id="user_tags_list" class="col s12"></form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-action modal-close waves-effect waves-green btn-flat" href="#!">Cancel</a>
+                <a class="modal-action waves-effect waves-green btn-flat" onclick="updateUser()">Save</a>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+        <script>
+
+            var mUsers;
+
+            var mEditingUser;
+            var mEditingUserRoles;
+
+            // Page-specific init
+            function init() {
+                refreshUsers();
+            }
+
+            function refreshUsers() {
+                var query = new Parse.Query(Parse.User);
+                query.ascending("username");
+                query.find().then(function(users) {
+                    displayUsers(users);
+                });
+            }
+
+            function displayUsers(users) {
+                var userList = document.getElementById("user_list");
+                mUsers = users;
+                $.each(
+                    users,
+                    function(i, user) {
+
+                        var col = document.createElement("div");
+                        userList.appendChild(col);
+                        col.className = "col s12";
+
+                        var item = document.createElement("div");
+                        col.appendChild(item);
+                        item.className = "card-panel waves-effect hoverable";
+                        item.onclick = function() {
+                            userSelected(i);
+                        }
+                        item.style.width = "100%";
+                        item.style.clear = "both";
+
+                        var username = document.createElement("p");
+                        item.appendChild(username);
+                        username.className = "align-left";
+                        username.innerHTML = user.getUsername();
+
+                        var email = document.createElement("p");
+                        item.appendChild(email);
+                        email.className = "align-right";
+                        email.style.color = "#aaa"
+                        email.innerHTML = user.getEmail();
+
+                    }
+                );
+            }
+
+            function userSelected(row) {
+                mEditingUser = null;
+                mEditingUserRoles = null;
+                if (mCategories) {
+                    populateEditUserModal(row);
+                } else {
+                    var query = new Parse.Query(Category);
+                    query.ascending("name");
+                    query.find().then(function(categories) {
+                        mCategories = categories;
+                        populateEditUserModal(row);
+                    });
+                }
+                $('#update_user_modal').openModal();
+            }
+
+            function populateEditUserModal(row) {
+                if (mUsers) {
+                    mEditingUser = mUsers[row];
+                    document.getElementById("update_user_modal_title").innerHTML = mEditingUser.getUsername();
+                    var params = {
+                        username: mEditingUser.getUsername()
+                    };
+                    Parse.Cloud.run('User_getTags', params, {
+                        success: function(tags) {
+                            mEditingUserRoles = tags.data;
+                            var form = document.getElementById('user_tags_list');
+                            form.innerHTML = "";
+                            $.each(
+                                mCategories,
+                                function(i, category) {
+                                    var item = document.createElement("p");
+                                    var label = document.createElement("label");
+                                    var checkbox = document.createElement("input");
+                                    var description = category.get("name");
+
+                                    checkbox.type = "checkbox";
+                                    checkbox.name = "categories";
+                                    checkbox.id = "category" + i;
+                                    checkbox.value = description;
+
+                                    for (var j=0; j<mEditingUserRoles.length; j++) {
+                                        if (mEditingUserRoles[j].getName() == category.get("name")) {
+                                            checkbox.checked = true;
+                                            break;
+                                        }
+                                    }
+
+                                    label.htmlFor = checkbox.id;
+                                    label.innerHTML = description;
+                                    label.className = "black-text";
+
+                                    item.appendChild(checkbox);
+                                    item.appendChild(label);
+
+                                    form.appendChild(item);
+                                }
+                            );
+                        },
+                        error: function(error) {
+                            console.log("Error retrieving tags for user " + mEditingUser.getUsername + ": " + error.code + ", " + error.message);
+                        }
+                    });
+                }
+            }
+
+            function updateUser() {
+                var added = [];
+                var deleted = [];
+
+                var selected = [];
+                $.each($("input[name='categories']:checked"), function(){            
+                    selected.push($(this).val());
+                });
+
+                // Loop through selected elements
+                // See which ones are not in mEditingUserRoles
+                // These get pushed to "added"
+                for (var i=0; i<selected.length; i++) {
+                    var found = false;
+                    for (var j=0; j<mEditingUserRoles.length; j++) {
+                        if (selected[i] == mEditingUserRoles[j].getName()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        added.push(selected[i]);
+                    }
+                }
+
+                // Loop through mEditingUserRoles
+                // See which ones are no longer selected
+                // These get pushed to "deleted"
+                for (var i=0; i<mEditingUserRoles.length; i++) {
+                    if (selected.indexOf(mEditingUserRoles[i].getName()) == -1) {
+                        deleted.push(mEditingUserRoles[i].getName());
+                    }
+                }
+
+                // Save the added list
+                for (var i=0; i<added.length; i++) {
+                    var tag = added[i];
+                    var params = {
+                        username: mEditingUser.getUsername(),
+                        tag: tag
+                    };
+                    Parse.Cloud.run('User_addTag', params, {
+                        success: function(response) {
+                            console.log("Added tag " + tag + ": " + JSON.stringify(response));
+                        },
+                        error: function(error) {
+                            console.log("Failed to add tag " + tag + ": " + JSON.stringify(error));
+                        }
+                    });
+                }
+
+                // Save the deleted list
+                for (var i=0; i<deleted.length; i++) {
+                    var tag = deleted[i];
+                    var params = {
+                        username: mEditingUser.getUsername(),
+                        tag: tag
+                    };
+                    Parse.Cloud.run('User_removeTag', params, {
+                        success: function(response) {
+                            console.log("Deleted tag " + tag + ": " + JSON.stringify(response));
+                        },
+                        error: function(error) {
+                            console.log("Failed to delete tag " + tag + ": " + JSON.stringify(error));
+                        }
+                    });
+                }
+
+                $('#update_user_modal').closeModal();
+            }
+
+        </script>
+        <script src="js/common.js"></script>
+
+    </body>
+</html>

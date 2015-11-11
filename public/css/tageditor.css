@@ -1,0 +1,36 @@
+#users_in_tag {
+	padding-bottom:16px;
+}
+
+#users_in_tag .deletable-list-item {
+	clear: both;
+	overflow: auto;
+	padding-left: 16px;
+	padding-right: 16px;
+}
+
+.align-left {
+	float: left;
+}
+.align-right {
+	float: right;
+}
+
+.deletable-list-item {
+	background: #fff;
+	transition: background .3s ease-in-out;
+}
+
+.deletable-list-item:hover {
+	background: #ddd;
+}
+
+.deletable-list-item .delete-button {
+	opacity: 0.2;
+	color: #555;		
+	transition: opacity .3s ease-in-out;
+}
+
+.deletable-list-item:hover .delete-button {
+	opacity: 1;
+}

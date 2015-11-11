@@ -1,0 +1,45 @@
+/* default styles for Quill */
+#toolbar {
+    border: 1px solid #e5e5e5;
+    width: 70%;
+    margin: 20px auto;
+    box-shadow: 2px 1px 5px rgba(0,0,0,0.2);
+}
+#title_field {
+    width: 70%;
+    margin: 20px auto;
+    box-shadow: 2px 1px 5px rgba(0,0,0,0.2);
+    border: 1px solid #e5e5e5;
+    height: 48px;
+}
+#editor {
+    width: 70%;
+    margin: 20px auto;
+    box-shadow: 2px 1px 5px rgba(0,0,0,0.2);
+    border: 1px solid #e5e5e5;
+    height: calc(100% - 244px);
+}        
+
+/* override Quill styles for mobile devices */
+@media screen and (max-width: 1024px) {
+    #toolbar {
+        border: 1px solid #e5e5e5;
+        width: 95%;
+        margin: 20px auto;
+        box-shadow: 2px 1px 5px rgba(0,0,0,0.2);
+    }
+    #title_field {
+        width: 95%;
+        margin: 20px auto;
+        box-shadow: 2px 1px 5px rbga(0,0,0,0.2);
+        border: 1px solid #e5e5e5;
+        height: 48px;
+    }
+    #editor {
+        width: 95%;
+        margin: 20px auto;
+        box-shadow: 2px 1px 5px rgba(0,0,0,0.2);
+        border: 1px solid #e5e5e5;
+        height: calc(100% - 172px);
+    }
+}

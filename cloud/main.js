@@ -135,8 +135,17 @@ Parse.Cloud.define("User_setPermissionLevel", User.setPermissionLevel_cloud);
 
 /**
  * Gets a user's permission level
- * Returns adminRole or modRole, or null
+ * Returns administrator, moderator, or regular
  * @param {String} username
- * @return {Parse.Role} level
+ * @return {String} level
  */
 Parse.Cloud.define("User_getPermissionLevel", User.getPermissionLevel_cloud);
+
+/**
+ * Sends an email to moderators
+ * requesting for the current user
+ * to be added to a list of categories.
+ * @param {String[]} categories
+ * @param {String[]} newCategories
+ */
+Parse.Cloud.define("User_requestCategoryAccess", User.requestCategoryAccess_cloud);

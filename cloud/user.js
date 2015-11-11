@@ -3,9 +3,11 @@ exports.removeTag_cloud = removeTag_cloud;
 exports.getTags_cloud = getTags_cloud;
 exports.setPermissionLevel_cloud = setPermissionLevel_cloud;
 exports.getPermissionLevel_cloud = getPermissionLevel_cloud;
+exports.requestCategoryAccess_cloud = requestCategoryAccess_cloud;
 
 var ResponseCodes = require('cloud/response_codes.js');
 var Tag = require('cloud/tag.js');
+var Mailgun = require('mailgun');
 
 function addTag_cloud(request, response) {
 	var username = request.params.username;
@@ -98,6 +100,32 @@ function getPermissionLevel_cloud(request, response) {
 			});
 		}
 	});
+}
+
+function requestCategoryAccess_cloud(request, response) {
+	var categories = request.params.categories;
+	var newCategories = request.params.newCategories;
+	if (categories.length == 0 && newCategories.length == 0) {
+		response.success({
+			code: ResponseCodes.ARRAY_SIZE_ZERO,
+			data: "You need to specify at least one category"
+		});
+	} else {
+		requestCategoryAccess(request.user, categories, newCategories, {
+			success: function(responseCode, object) {
+				response.success({
+					code: responseCode,
+					data: object
+				});
+			},
+			error: function(responseCode, errorMsg) {
+				response.success({
+					code: responseCode,
+					data: errorMsg
+				});
+			}
+		});
+	}
 }
 
 /* Implementations */
@@ -281,6 +309,53 @@ function getPermissionLevel(username, callbacks) {
     			permissionLevel = "regular";
     		}
 			callbacks.success(ResponseCodes.OK, permissionLevel);
+		},
+		error: function(object, error) {
+			callbacks.error(error.code, error.message);
+		}
+	});
+}
+
+function requestCategoryAccess(user, categories, newCategories, callbacks) {
+	Mailgun.initialize('sandbox8f3d3bb906f04819befc43669fa7fd21.mailgun.org', 'key-7a0ce92765832b38d88fcbda4d766d2f');
+
+	var username = user.getUsername();
+	var subject = "Category Access Request from " + username;
+
+	var query = new Parse.Query(Parse.User);
+	query.containedIn("permissionLevel", [ "moderator", "administrator" ]);
+	query.find({
+		success: function(moderators) {
+			var recipients = [];
+			for (var i=0; i<moderators.length; i++) {
+				recipients.push(moderators[i].getEmail());
+			}
+			var to = recipients.join(";");
+			var text = username + " has requested permissions to contribute to the following categories:\n";
+			for (var i=0; i<categories.length; i++) {
+				text += "\n";
+				text += categories[i];
+			}
+			text += "\n\nand has requested the creation of the following categories:\n";
+			for (var i=0; i<newCategories.length; i++) {
+				text += "\n";
+				text += newCategories[i];
+			}
+			text += "\n\nHandle this request: http://moscropsecondary.parseapp.com/usermanager.html";
+
+			Mailgun.sendEmail({
+		        to: to,
+		        from: "no-reply@moscropsecondary.parseapp.com",
+		        subject: subject,
+		        text: text
+		    }, {
+		        success: function(httpResponse) {
+		            callbacks.success(ResponseCodes.OK, null);
+		        },
+		        error: function(httpResponse) {
+		            callbacks.error(ResponseCodes.ERROR, "Failed to send email");
+		        }
+		    });
 		},
 		error: function(object, error) {
 			callbacks.error(error.code, error.message);
