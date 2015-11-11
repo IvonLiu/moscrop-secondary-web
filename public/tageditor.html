@@ -159,7 +159,7 @@
                         <div class="row">
                             <div class="input-field col s12" onkeydown="if (event.keyCode == 13) addUserToTag()">
                                 <i class="material-icons prefix">add</i>
-                                <input id="add_user_to_club" type="text" class="validate">
+                                <input id="add_user_to_club" type="text" list="usernames" class="validate">
                                 <label for="add_user_to_club">Add user to tag</label>
                             </div>
                         </div>
@@ -172,17 +172,39 @@
             </div>
         </div>
 
+        <datalist id="usernames"></datalist>
+
         <!--Import jQuery before materialize.js-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
         <script>
 
             var mTags;
+
+            var mCurrentTag;
             var mCurrentTagUsers;
+            var mCurrentTagEditedUsers;
 
             // Page-specific init
             function init() {
+                loadUsers();
                 refreshTags();
+            }
+
+            function loadUsers() {
+                var query = new Parse.Query(Parse.User);
+                query.ascending("username");
+                query.find().then(function(users) {
+                    var datalist = document.getElementById('usernames');
+                    $.each(
+                        users,
+                        function(i, user) {
+                            var option = document.createElement("option");
+                            option.value = user.getUsername();
+                            datalist.appendChild(option);
+                        }
+                    );
+                });
             }
 
             function refreshTags() {
@@ -243,14 +265,16 @@
             }
 
             function tagSelected(position) {
-                mCurrentTagUsers = null;
+                mCurrentTag = mTags[position];
+                mCurrentTagUsers = [];
+                mCurrentTagEditedUsers = [];
                 if (mTags) {
-                    document.getElementById('update_tag_modal_title').innerHTML = mTags[position].get("name");
+                    document.getElementById('update_tag_modal_title').innerHTML = mCurrentTag.get("name");
                     document.getElementById('users_in_tag').innerHTML = "";
 
-                    var id_author = mTags[position].get("id_author");
-                    var id_category = mTags[position].get("id_category");
-                    var icon_img = mTags[position].get("icon_img");
+                    var id_author = mCurrentTag.get("id_author");
+                    var id_category = mCurrentTag.get("id_category");
+                    var icon_img = mCurrentTag.get("icon_img");
 
                     id_author = id_author == "@null" ? "" : id_author;
                     id_category = id_category == "@null" ? "" : id_category;
@@ -281,11 +305,11 @@
             function populateTagModalUsersList(position) {
                 if (mTags) {
                     var params = {
-                        tag: mTags[position].get("name")
+                        tag: mCurrentTag.get("name")
                     };
                     Parse.Cloud.run('Tag_getUsers', params, {
                         success: function(users) {
-                            mCurrentTagUsers = users.data;             
+                            mCurrentTagUsers = users.data;
                             $.each(
                                 mCurrentTagUsers,
                                 function (i, user) {
@@ -294,7 +318,7 @@
                             );
                         },
                         error: function(error) {
-                            console.log("Error retrieving users for tag " + mTags[position].get("name") + ": " + error.code + ", " + error.message);
+                            console.log("Error retrieving users for tag " + mCurrentTag.get("name") + ": " + error.code + ", " + error.message);
                         }
                     });
                 }
@@ -318,11 +342,18 @@
             }
 
             function addUserToTagUsersList(user) {
+
+                if (userAlreadyInTag(user)) {
+                    console.log("User already in tag");
+                    return;
+                }
+
+                mCurrentTagEditedUsers.push(user.getUsername());
+
                 var list = document.getElementById('users_in_tag');
                                     
                 var item = document.createElement("div");
                 list.appendChild(item);
-                item.id = "user_in_tag_" + user.id;
                 item.className = "deletable-list-item";
 
                 var left = document.createElement("p");
@@ -340,8 +371,24 @@
                 deleteButton.href = "#";
                 deleteButton.onclick = function() {
                     item.parentNode.removeChild(item);
+                    var index = mCurrentTagEditedUsers.indexOf(user.getUsername());
+                    if (index > -1) {
+                        mCurrentTagEditedUsers.splice(index, 1);
+                    }
+                    console.log("Array after deleting: \n" + JSON.stringify(mCurrentTagEditedUsers));
                 }
                 deleteButton.innerHTML = "&#10006;";
+
+                console.log("Array after adding: \n" + JSON.stringify(mCurrentTagEditedUsers));
+            }
+
+            function userAlreadyInTag(user) {
+                for (var i=0; i<mCurrentTagEditedUsers.length; i++) {
+                    if (user.getUsername() == mCurrentTagEditedUsers[i]) {
+                        return true;
+                    }
+                }
+                return false;
             }
 
             function addTag() {
@@ -370,6 +417,7 @@
 
             function updateTag() {
 
+                // Update tag info
                 var name = document.getElementById("update_tag_modal_title").innerHTML;
                 var id_author = document.getElementById("update_id_author_field").value;
                 var id_category = document.getElementById("update_id_category_field").value;
@@ -384,12 +432,73 @@
 
                 Parse.Cloud.run('Tag_update', params, {
                     success: function(object) {
-                        alert("Successfully updated tags");
+                        console.log("Successfully updated tags");
                     },
                     error: function(error) {
-                        alert("Error updating tags: " + error.code + ", " + error.message);
+                        console.log("Error updating tags: " + error.code + ", " + error.message);
                     }
                 });        
+
+                // Update tag users
+                var added = [];
+                var deleted = [];
+
+                // Generate added list
+                for (var i=0; i<mCurrentTagEditedUsers.length; i++) {
+                    var found = false;
+                    for (var j=0; j<mCurrentTagUsers.length; j++) {
+                        if (mCurrentTagEditedUsers[i] == mCurrentTagUsers[j].getUsername()) {
+                            found = true;
+                        }
+                        break;
+                    }
+                    if (!found) {
+                        added.push(mCurrentTagEditedUsers[i]);
+                    }
+                }
+
+                // Generate deleted list
+                for (var i=0; i<mCurrentTagUsers.length; i++) {
+                    if (mCurrentTagEditedUsers.indexOf(mCurrentTagUsers[i].getUsername()) == -1) {
+                        deleted.push(mCurrentTagUsers[i].getUsername());
+                    }
+                }
+
+                // Save added list
+                for (var i=0; i<added.length; i++) {
+                    var username = added[i];
+                    var params = {
+                        username: username,
+                        tag: mCurrentTag.get("name")
+                    };
+                    Parse.Cloud.run('Tag_addUser', params, {
+                        success: function(response) {
+                            console.log("Added user " + username + ": " + JSON.stringify(response));
+                        },
+                        error: function(error) {
+                            console.log("Failed to add user " + username + ": " + JSON.stringify(error));
+                        }
+                    });
+                }
+
+                // Save deleted list
+                for (var i=0; i<deleted.length; i++) {
+                    var username = deleted[i];
+                    var params = {
+                        username: username,
+                        tag: mCurrentTag.get("name")
+                    };
+                    Parse.Cloud.run('Tag_removeUser', params, {
+                        success: function(response) {
+                            console.log("Deleted user " + username + ": " + JSON.stringify(response));
+                        },
+                        error: function(error) {
+                            console.log("Failed to delete user " + username + ": " + JSON.stringify(error));
+                        }
+                    });
+                }
+
+                $('#update_tag_modal').closeModal();
             }
 
             function exportTags() {
