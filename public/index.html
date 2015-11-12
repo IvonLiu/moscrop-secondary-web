@@ -21,24 +21,43 @@
         <div id="navbar-container">
             <ul id="accountDropdownItems" class="dropdown-content">
                 <li><a href="settings.html">Settings</a></li>
-                <!--<li class="divider"></li>-->
                 <li><a onclick="logout()">Logout</a></li>
+            </ul>
+            <ul id="loggedInOverflowItems" class="dropdown-content">
+                <li id="submitButton_overflow"><a href="submit.html">Submit</a></li>
+                <li id="adminButton_overflow"><a href="administration.html">Admin</a></li>
+                <li><a href="settings.html">Settings</a></li>
+                <li><a onclick="logout()">Logout</a></li>
+            </ul>
+            <ul id="loggedOutOverflowItems" class="dropdown-content">
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
             </ul>
             <div class="navbar-fixed" style="height:72px">
                 <nav>
                     <div class="nav-wrapper" style="background-color:#4784c0; padding-left:16px; padding-right:16px">
                         <a href="index.html" class="brand-logo">Moscrop Secondary</a>
                         <div id="toolbarActions" class="hidden">
-                            <ul id="loggedInActions" class="right hide-on-med-and-down">
-                                <li id="username" style="background-color:#4784c0; margin-right:16px"></li>
-                                <li id="submitButton"><a href="submit.html" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Create new post"><i class="material-icons">create</i></a></li>
-                                <li id="adminButton"><a href="administration.html" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Administration"><i class="material-icons">lock</i></a></li>
-                                <li id="accountDropdown"><a class="dropdown-button" href="#!" data-activates="accountDropdownItems"><i class="material-icons">account_circle</i></a></li>
-                            </ul>
-                            <ul id="loggedOutActions" class="right hide-on-med-and-down">
-                                <li id="loginButton"><a href="login.html">Login</a></li>
-                                <li id="registerButton"><a href="register.html">Register</a></li>
-                            </ul>
+                            <div id="loggedInActions">
+                                <ul class="right hide-on-med-and-down">
+                                    <li id="username" style="background-color:#4784c0; margin-right:16px"></li>
+                                    <li id="submitButton"><a href="submit.html" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Create new post"><i class="material-icons">create</i></a></li>
+                                    <li id="adminButton"><a href="administration.html" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Administration"><i class="material-icons">lock</i></a></li>
+                                    <li id="accountDropdown"><a class="dropdown-button" href="#!" data-activates="accountDropdownItems"><i class="material-icons">account_circle</i></a></li>
+                                </ul>   
+                                <ul class="right hide-on-large-only">
+                                    <li id="loggedInOverflow"><a class="dropdown-button" href="#!" data-activates="loggedInOverflowItems"><i class="material-icons">more_vert</i></a></li>
+                                </ul>
+                            </div>
+                            <div id="loggedOutActions">
+                                <ul class="right hide-on-med-and-down">
+                                    <li id="loginButton"><a href="login.html">Login</a></li>
+                                    <li id="registerButton"><a href="register.html">Register</a></li>
+                                </ul>
+                                <ul class="right hide-on-large-only">
+                                    <li id="loggedOutOverflow"><a class="dropdown-button" href="#!" data-activates="loggedOutOverflowItems"><i class="material-icons">more_vert</i></a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </nav>

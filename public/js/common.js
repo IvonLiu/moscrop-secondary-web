@@ -45,8 +45,8 @@ $(document).ready(function(){
 	 					// Only show admin button to
 	 					// administrators and moderators                   
 	                    if (permissionLevel.data == "regular") {                            
-	                        var adminButton = document.getElementById("adminButton");
-	                        adminButton.style.display = "none";
+	                        document.getElementById("adminButton").style.display = "none";
+	                        document.getElementById("adminButton_overflow").style.display = "none";
 	                    }
 
 	                    // Show submit button if user
