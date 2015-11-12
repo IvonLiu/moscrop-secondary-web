@@ -1,0 +1,326 @@
+<html>
+
+    <head>
+        <title>Moscrop Secondary | Settings</title>
+
+        <!--Import materialize.css-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <link type="text/css" rel="stylesheet" href="css/common.css"/>
+        <link type="text/css" rel="stylesheet" href="css/settings.css"/>
+
+        <!--Let browser know website is optimized for mobile-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <!-- Import Parse -->
+        <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+    </head>
+
+    <body>
+
+        <div id="navbar-container">
+            <ul id="accountDropdownItems" class="dropdown-content">
+                <li><a href="settings.html">Settings</a></li>
+                <!--<li class="divider"></li>-->
+                <li><a onclick="logout()">Logout</a></li>
+            </ul>
+            <div class="navbar-fixed" style="height:72px">
+                <nav>
+                    <div class="nav-wrapper" style="background-color:#4784c0; padding-left:16px; padding-right:16px">
+                        <a href="index.html" class="brand-logo">Moscrop Secondary</a>
+                        <div id="toolbarActions" class="hidden">
+                            <ul id="loggedInActions" class="right hide-on-med-and-down">
+                                <li id="username" style="background-color:#4784c0; margin-right:16px"></li>
+                                <li id="submitButton"><a href="submit.html" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Create new post"><i class="material-icons">create</i></a></li>
+                                <li id="adminButton"><a href="administration.html" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Administration"><i class="material-icons">lock</i></a></li>
+                                <li id="accountDropdown"><a class="dropdown-button" href="#!" data-activates="accountDropdownItems"><i class="material-icons">account_circle</i></a></li>
+                            </ul>
+                            <ul id="loggedOutActions" class="right hide-on-med-and-down">
+                                <li id="loginButton"><a href="login.html">Login</a></li>
+                                <li id="registerButton"><a href="register.html">Register</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="section">
+                <h4>My Categories</h4>
+                <div class="row">
+                    <div class="col s12">
+                        <div class="card">
+                            <div id="categories_list">
+                                <p style="color:#aaa;padding:16px">Loading...</p>
+                            </div>
+                            <div class="card-action">
+                                <a href="#" onclick="openRequestModal()">Request access</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="delete_category_modal" class="modal">
+            <div class="modal-content">
+                <h4 id="delete_category_title">Confirm Delete</h4>
+                <div class="container">
+                    <div class="section">
+                        <p>Are you sure you want to delete this category?</p>
+                        <p>This action cannot be undone. You will have to request access from a moderator if you want to regain access to this category.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="delete_category_confirm" class="modal-action waves-effect waves-green btn-flat">OK</a>
+                <a class="modal-action modal-close waves-effect waves-green btn-flat" href="#!">Cancel</a>
+            </div>
+        </div>
+
+        <div id="request_access_modal" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                <h4>Request Access</h4>
+                <div class="row">
+                    <form id="available_categories" class="col s12" action="#"></form>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12" onkeydown="if (event.keyCode == 13) addClub()">
+                        <i class="material-icons prefix">add</i>
+                        <input id="request_new_club" type="text" class="validate">
+                        <label for="request_new_club">Request new club</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-action waves-effect waves-green btn-flat" onclick="sendAccessRequest()">Request</a>
+                <a class="modal-action modal-close waves-effect waves-green btn-flat" href="#!">Cancel</a>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+        <script>
+
+            var mCurrentUserCategories;
+
+            function init() {
+                loadCurrentUserCategories();
+            }
+
+            function loadCurrentUserCategories() {
+                var params = {
+                    username: currentUser.getUsername()
+                };
+                Parse.Cloud.run('User_getTags', params, {
+                    success: function(tags) {
+                        mCurrentUserCategories = tags.data;
+                        displayCurrentUserCategories();
+                    },
+                    error: function(error) {
+                        // Ignore error for now
+                    }
+                });
+            }
+
+            function displayCurrentUserCategories() {
+                if (mCurrentUserCategories && mCurrentUserCategories.length > 0) {
+                    var list = document.getElementById('categories_list');
+                    list.innerHTML = "";
+                    $.each(
+                        mCurrentUserCategories,
+                        function(i, category) {
+                            var item = document.createElement("div");
+                            list.appendChild(item);
+                            item.className = "deletable-list-item left-right-container";
+
+                            var left = document.createElement("p");
+                            item.appendChild(left);
+                            left.className = "align-left";
+                            left.innerHTML = category.getName();
+
+                            var right = document.createElement("p");
+                            item.appendChild(right);
+                            right.className = "align-right";
+
+                            var deleteButton = document.createElement("a");
+                            right.appendChild(deleteButton);
+                            deleteButton.className = "delete-button";
+                            deleteButton.href = "#";
+                            deleteButton.onclick = function() {
+                                document.getElementById('delete_category_title').innerHTML = "Confirm Delete: " + category.getName();
+                                document.getElementById('delete_category_confirm').onclick = function() {
+
+                                    list.removeChild(item);
+                                    if (list.children.length == 0) {
+                                        displayNoCategoriesMessage();
+                                    }
+
+                                    var params = {
+                                        username: currentUser.getUsername(),
+                                        tag: category.getName()
+                                    };
+                                    Parse.Cloud.run('User_removeTag', params, {
+                                        success: function(response) {
+                                            console.log("Successfully deleted tag: " + response);
+                                        },
+                                        error: function(error) {
+                                            console.log("Failed to delete tag: " + error);
+                                        }
+                                    });
+
+                                    $('#delete_category_modal').closeModal();
+                                }
+                                $('#delete_category_modal').openModal();
+                            }
+                            deleteButton.innerHTML = "&#10006;";
+                        }
+                    );
+                } else {
+                    displayNoCategoriesMessage();
+                }
+            }
+
+            function displayNoCategoriesMessage() {
+                var list = document.getElementById('categories_list');
+                list.innerHTML = "";
+
+                var message = document.createElement("h6");
+                message.style.color = "#aaa";
+                message.style.padding = "16px";
+                message.innerHTML = "You don't belong in any categories yet. Why not <a href=\"#\" onclick=\"openRequestModal()\">request to join one</a>?";
+                list.appendChild(message); 
+            }
+
+            function openRequestModal() {
+                $('#request_access_modal').openModal();
+
+                if (mCategories) {
+                    populateRequestModal();
+                } else {
+                    var query = new Parse.Query(Category);
+                    query.ascending("name");
+                    query.find().then(function(categories) {
+                        mCategories = categories;
+                        populateRequestModal();
+                    });
+                }
+            }
+
+            function populateRequestModal() {
+                var form = document.getElementById('available_categories');
+                form.innerHTML = "";
+                $.each(
+                    mCategories,
+                    function(i, category) {
+                        if (userNotYetInCategory(category)) {
+                            var item = document.createElement("p");
+                            var label = document.createElement("label");
+                            var checkbox = document.createElement("input");
+                            var description = category.get("name");
+
+                            checkbox.type = "checkbox";
+                            checkbox.name = "categories";
+                            checkbox.id = "category" + i;
+                            checkbox.value = description;
+
+                            label.htmlFor = checkbox.id;
+                            label.innerHTML = description;
+                            label.className = "black-text";
+
+                            item.appendChild(checkbox);
+                            item.appendChild(label);
+
+                            form.appendChild(item);
+                        }
+                    }
+                );
+            }
+
+            function addClub() {
+                var newClubField = document.getElementById("request_new_club");
+                var newClub = newClubField.value;
+
+                for (var i=0; i<mCategories.length; i++) {
+                    if (mCategories[i].get("name") == newClub) {
+                        Materialize.toast('This club already exists', 4000);
+                        return; 
+                    }
+                }
+
+                if (newClub) {
+                    var form = document.getElementById('available_categories');
+                    var item = document.createElement("p");
+                    var label = document.createElement("label");
+                    var checkbox = document.createElement("input");
+
+                    checkbox.type = "checkbox";
+                    checkbox.name = "new_categories";
+                    checkbox.id = "newClub_"+newClub;
+                    checkbox.value = newClub;
+                    checkbox.checked = true;
+
+                    label.htmlFor = checkbox.id;
+                    label.innerHTML = newClub;
+                    label.className = "black-text";
+
+                    item.appendChild(checkbox);
+                    item.appendChild(label);
+
+                    form.appendChild(item);
+                    newClubField.value = "";
+                }
+            }
+
+            function userNotYetInCategory(category) {
+                for (var i=0; i<mCurrentUserCategories.length; i++) {
+                    if (mCurrentUserCategories[i].getName() == category.get("name")) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function sendAccessRequest() {
+
+                var selectedCategories = [];
+                $.each($("input[name='categories']:checked"), function(){            
+                    selectedCategories.push($(this).val());
+                });
+
+                var newCategories = [];
+                $.each($("input[name='new_categories']:checked"), function(){            
+                    newCategories.push($(this).val());
+                });                
+
+                var params = {
+                    categories: selectedCategories,
+                    newCategories: newCategories
+                };
+
+                Parse.Cloud.run('User_requestCategoryAccess', params, {
+                    success: function(response) {
+                        console.log(JSON.stringify(response));
+                        switch (response.code) {
+                            case "1007": {
+                                alert("You need to select at least one category");
+                                break;
+                            }
+                            default: {
+                                Materialize.toast("Request submitted. Please await moderator approval!", 4000);
+                                $('#request_access_modal').closeModal();
+                            }
+                        }
+
+                    },
+                    error: function(response) {
+                        console.log(JSON.stringify(response));
+                    }
+                });    
+            }
+        </script>
+        <script src="js/common.js"></script>
+    </body>
+</html>

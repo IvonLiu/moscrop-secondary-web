@@ -32,9 +32,8 @@
                         <div id="toolbarActions" class="hidden">
                             <ul id="loggedInActions" class="right hide-on-med-and-down">
                                 <li id="username" style="background-color:#4784c0; margin-right:16px"></li>
-                                <li id="submitButton"><a href="submit.html"><i class="material-icons">create</i></a></li>
-                                <li id="requestButton"><a href="#" onclick="openRequestModal()"><i class="material-icons">create</i></a></li>
-                                <li id="adminButton"><a href="administration.html"><i class="material-icons">lock</i></a></li>
+                                <li id="submitButton"><a href="submit.html" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Create new post"><i class="material-icons">create</i></a></li>
+                                <li id="adminButton"><a href="administration.html" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Administration"><i class="material-icons">lock</i></a></li>
                                 <li id="accountDropdown"><a class="dropdown-button" href="#!" data-activates="accountDropdownItems"><i class="material-icons">account_circle</i></a></li>
                             </ul>
                             <ul id="loggedOutActions" class="right hide-on-med-and-down">
@@ -354,7 +353,7 @@
                                     
                 var item = document.createElement("div");
                 list.appendChild(item);
-                item.className = "deletable-list-item";
+                item.className = "deletable-list-item left-right-container";
 
                 var left = document.createElement("p");
                 item.appendChild(left);
@@ -375,11 +374,8 @@
                     if (index > -1) {
                         mCurrentTagEditedUsers.splice(index, 1);
                     }
-                    console.log("Array after deleting: \n" + JSON.stringify(mCurrentTagEditedUsers));
                 }
                 deleteButton.innerHTML = "&#10006;";
-
-                console.log("Array after adding: \n" + JSON.stringify(mCurrentTagEditedUsers));
             }
 
             function userAlreadyInTag(user) {
