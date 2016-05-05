@@ -64,8 +64,48 @@
             </div>
         </div>
 
+        <div id="post_container" class="row">
+            <div class="col s3">
+                <div class="card-panel">
+                    <div class="card-image">
+                </div>
+            </div>
+        </div>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+        <script>
+
+            var mPosts;
+
+            function init() {
+                var query = new Parse.Query("Posts");
+                query.descending("published");
+                query.include("category");
+                query.find({
+                    success: function(posts) {
+                        mPosts = posts;
+                        displayPosts();
+                    },
+                    error: function(object, error) {
+                        console.log("Error fetching posts: " + error.code + ", " + error.message);
+                    }
+                });   
+            }
+
+            function displayPosts() {
+                if (mPosts) {
+                    var container = document.getElementById('post_container');
+                    $.each(
+                        mPosts,
+                        function(i, post) {
+
+                        }
+                    )
+                }
+            }
+
+        </script>
         <script src="js/common.js"></script>
     </body>
 </html>

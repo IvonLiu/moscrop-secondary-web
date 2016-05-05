@@ -230,6 +230,9 @@
 
             var submitted = false;
 
+            var titleField;
+            var editor;
+
             // Page-specific init
             function init() {
 
@@ -242,11 +245,11 @@
                     $('#tag_chooser').material_select();
                     refreshTagChooser();
 
-                    var titleField = new Quill('#title_field', {
+                    titleField = new Quill('#title_field', {
                         theme: 'snow'
                     });
 
-                    var editor = new Quill('#editor', {
+                    editor = new Quill('#editor', {
                         modules: {
                             'toolbar': {
                                 container: '#toolbar'
