@@ -1,0 +1,24 @@
+{
+  "name": "moscrop-secondary-web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "async": "^2.0.0-rc.5",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "~1.13.2",
+    "cookie-parser": "~1.3.5",
+    "debug": "~2.2.0",
+    "express": "~4.13.1",
+    "express-jwt": "^3.4.0",
+    "jade": "~1.11.0",
+    "jsonwebtoken": "^7.0.0",
+    "morgan": "~1.6.1",
+    "mysql": "^2.10.2",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "serve-favicon": "~2.3.0"
+  }
+}

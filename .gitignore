@@ -2,7 +2,7 @@
 #
 # .gitignore declares what files should be ignored by git
 #
-#    This particular file is a composite of github's Android and Eclipse 
+#    This particular file is a composite of github's Android and Eclipse
 #                          files, along with some custom additions.
 #
 #############################################################################
@@ -35,7 +35,7 @@ local.properties
 # PDT-specific
 .buildpath
 
-# sbteclipse plugin 
+# sbteclipse plugin
 .target
 
 # TeXlipse plugin
@@ -66,6 +66,7 @@ proguard/
 #############################################################################
 
 node_modules/
+config.json
 
 # API keys stored here
 api_config.js
@@ -79,7 +80,7 @@ global.json
 # Cached copy of blogger feed
 blogger_posts.json
 
-# Temp files for KDE and other Editor's 
+# Temp files for KDE and other Editor's
 *~
 
 #############################################################################
