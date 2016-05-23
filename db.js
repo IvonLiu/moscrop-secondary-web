@@ -30,15 +30,29 @@ exports.connect = function(mode, callback) {
         + 'id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         + 'title VARCHAR(255), '
         + 'content TEXT, '
-        + 'author INT(11)'
+        + 'author INT(11) NOT NULL, '
+        + 'category INT(11) NOT NULL, '
+        + 'created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL'
         + ')', callback);
     },
     function(callback) {
       state.pool.query(
         'CREATE TABLE IF NOT EXISTS users ('
         + 'id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, '
-        + 'username VARCHAR(100) UNIQUE, '
-        + 'password VARCHAR(100)'
+        + 'username VARCHAR(100) UNIQUE NOT NULL, '
+        + 'password VARCHAR(100) NOT NULL, '
+        + 'first_name VARCHAR(100) NOT NULL, '
+        + 'last_name VARCHAR(100) NOT NULL, '
+        + 'student_number INT NOT NULL, '
+        + 'is_moderator BOOL DEFAULT 0 NOT NULL, '
+        + 'categories TEXT DEFAULT "" NOT NULL'
+        + ')', callback);
+    },
+    function(callback) {
+      state.pool.query(
+        'CREATE TABLE IF NOT EXISTS categories ('
+        + 'id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        + 'name VARCHAR(100) UNIQUE NOT NULL'
         + ')', callback);
     }
   ], function(err, results) {

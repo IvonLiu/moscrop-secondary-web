@@ -9,12 +9,17 @@ var db = require('../db.js');
 
 router.post('/register', function(req, res, next) {
 
-  if (!req.body.username || !req.body.password) {
+  if (!req.body.username || !req.body.password
+      || !req.body.firstName || !req.body.lastName
+      || !req.body.studentNumber) {
     return res.status(400).send('Missing username or password');
   }
 
   var username = req.body.username;
   var hash = bcrypt.hashSync(req.body.password);
+  var firstName = req.body.firstName;
+  var lastName = req.body.lastName;
+  var studentNumber = req.body.studentNumber;
 
   db.get().query('SELECT * FROM users WHERE username="' + username + '"', function(err, rows) {
 
@@ -23,15 +28,19 @@ router.post('/register', function(req, res, next) {
     if (rows.length) {
       res.status(403).send('This username has already been taken.');
     } else {
-      db.get().query('INSERT INTO users (username, password) VALUES ("' + username + '", "' + hash + '")', function(err, rows) {
-        if (err) return utils.error(res, err);
-        db.get().query('SELECT * FROM users WHERE id="' + rows.insertId + '"', function(err, rows) {
+      db.get().query(
+        'INSERT INTO users (username, password, first_name, last_name, student_number)'
+        + 'VALUES ("' + username + '", "' + hash + '", "' + firstName + '", "' + lastName + '", "' + studentNumber + '")',
+        function(err, rows) {
           if (err) return utils.error(res, err);
-          res.send({
-            token: jwt.generateToken(rows[0])
+          db.get().query('SELECT * FROM users WHERE id="' + rows.insertId + '"', function(err, rows) {
+            if (err) return utils.error(res, err);
+            res.send({
+              token: jwt.generateToken(rows[0])
+            });
           });
-        });
-      });
+        }
+      );
     }
 
   });
