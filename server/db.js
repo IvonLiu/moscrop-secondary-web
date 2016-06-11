@@ -2,8 +2,8 @@ var mysql = require('mysql');
 var async = require('async');
 var config = require('./config.json');
 
-var PRODUCTION_DB = 'production';
-var TEST_DB = 'testing';
+var PRODUCTION_DB = 'moscrop_app_prod';
+var TEST_DB = 'moscrop_app_prod'; // this isn't really used at all
 
 exports.MODE_PRODUCTION = 'mode_production';
 exports.MODE_TEST = 'mode_test';

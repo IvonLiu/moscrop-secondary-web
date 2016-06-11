@@ -11,6 +11,7 @@ require('./auth/passport');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var posts = require('./routes/posts');
+var categories = require('./routes/categories');
 
 var app = express();
 
@@ -32,6 +33,7 @@ var db = require('./db.js');
 app.use('/api/', routes);
 app.use('/api/users', users);
 app.use('/api/posts', posts);
+app.use('/api/categories', categories);
 
 db.connect(db.MODE_PRODUCTION, function(err) {
   if (err) {

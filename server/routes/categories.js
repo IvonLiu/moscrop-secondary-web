@@ -173,4 +173,11 @@ router.delete('/:id', jwt.auth, function(req, res, next) {
   });
 });
 
+router.get('/:id/posts', function(req, res, next) {
+  db.get().query('SELECT * FROM posts WHERE category="' + req.params.id + '"', function(err, rows) {
+    if (err) return utils.error(res, err);
+    res.send(rows);
+  });
+});
+
 module.exports = router;
