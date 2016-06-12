@@ -65,7 +65,6 @@ proguard/
 # Other Misc. files
 #############################################################################
 
-node_modules/
 config.json
 
 # API keys stored here
@@ -90,3 +89,35 @@ blogger_posts.json
 .idea/
 #gradle.properties
 *.iml
+
+#############################################################################
+# ng2
+#############################################################################
+
+# compiled output
+dist
+tmp
+
+# dependencies
+node_modules
+bower_components
+
+# IDEs and editors
+/.idea
+
+# misc
+.sass-cache
+connect.lock
+coverage/*
+libpeerconnection.log
+npm-debug.log
+testem.log
+typings
+
+# e2e
+e2e/*.js
+e2e/*.map
+
+#System Files
+.DS_Store
+Thumbs.db

@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var cors = require('cors');
 
 var passport = require('passport');
 require('./auth/passport');
@@ -27,6 +28,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
+app.use(cors());
 
 var db = require('./db.js');
 
@@ -41,6 +43,13 @@ db.connect(db.MODE_PRODUCTION, function(err) {
     console.error(err.stack);
   }
 });
+
+// cors stuff
+/*app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});*/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
