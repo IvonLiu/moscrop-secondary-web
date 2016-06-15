@@ -1,33 +1,48 @@
 import { Component } from '@angular/core';
-import { Headers, Http } from '@angular/http';
+import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router-deprecated';
 
+import { PostListComponent } from './post-list.component';
+import { PostService } from './post.service';
 import { CategoryService } from './category.service';
+import { UserService } from './user.service';
+import { SettingsComponent } from './settings.component';
 
 @Component({
   selector: 'moscrop-app',
   templateUrl: 'app/moscrop-app.component.html',
-  providers: [CategoryService]
+  directives: [ROUTER_DIRECTIVES],
+  providers: [
+    ROUTER_PROVIDERS,
+    PostService,
+    CategoryService,
+    UserService
+  ]
 })
+@RouteConfig([
+  {
+    path: '/posts',
+    name: 'Posts',
+    component: PostListComponent,
+    useAsDefault: true
+  }, {
+    path: '/settings',
+    name: 'Settings',
+    component: SettingsComponent
+  }
+])
 export class MoscropApp {
 
-  constructor(private categoryService: CategoryService) {}
+  /*  messages: Message[];
 
-  test(): void {
-    this.categoryService.getCategories().then(data => console.log('All:', JSON.stringify(data)));
-    this.categoryService.getCategory(2).then(data => console.log('Single:', JSON.stringify(data)));
-  }
-
-/*  messages: Message[];
-
-  constructor() {
-    this.messages = [];
-  }
-
-  addMessage(message: HTMLInputElement): void {
-    if (message.value) {
-      this.messages.push(new Message('User', message.value, new Date().getTime()));
-      message.value = '';
+    constructor() {
+      this.messages = [];
     }
-  }
-*/
+
+    addMessage(message: HTMLInputElement): void {
+      if (message.value) {
+        this.messages.push(new Message('User', message.value, new Date().getTime()));
+        message.value = '';
+      }
+    }
+  */
 }

@@ -1,9 +1,9 @@
-export class Category {
+export class User {
   id: number;
   username: string;
-  firstName: string;
-  lastName: string;
-  studentNumber: number;
-  isModerator: boolean;
-  categories: [number];
+  first_name: string;
+  last_name: string;
+  student_number: number;
+  is_moderator: boolean;
+  categories: number[];
 }

@@ -71,6 +71,24 @@ router.post('/login', function(req, res, next) {
 
 });
 
+router.get('/', function(req, res, next) {
+  db.get().query('SELECT * FROM users', function(err, rows) {
+    if (err) return utils.error(res, err);
+    for (var row of rows) {
+      delete row.password;
+    }
+    res.send(rows);
+  });
+});
+
+router.get('/:id', function(req, res, next) {
+  db.get().query('SELECT * FROM users WHERE id="' + req.params.id + '"', function(err, rows) {
+    if (err) return utils.error(res, err);
+    delete rows[0].password;
+    res.send(rows[0]);
+  });
+});
+
 router.get('/:id/categories', function(req, res, next) {
 
   db.get().query('SELECT categories FROM users WHERE id="' + req.params.id + '"', function(err, rows) {
