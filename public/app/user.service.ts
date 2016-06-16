@@ -5,6 +5,8 @@ import 'atob/browser-atob';
 import 'rxjs/add/operator/toPromise';
 
 import { User } from './user';
+import { Category } from './category';
+import { Post } from './post';
 
 @Injectable()
 export class UserService {
@@ -36,6 +38,14 @@ export class UserService {
     // TODO return user to main page
   }
 
+  register() {
+    // TODO
+  }
+
+  logIn() {
+    // TODO
+  }
+
   getUsers(): Promise<User[]> {
     return this.http.get(this.urlBase)
       .toPromise()
@@ -45,6 +55,30 @@ export class UserService {
 
   getUser(id: number): Promise<User> {
     let url = `${this.urlBase}/${id}`;
+    return this.http.get(url)
+      .toPromise()
+      .then(response => response.json())
+      .catch(this.handleError);
+  }
+
+  getCategories(id: number): Promise<Category[]> {
+    let url = `${this.urlBase}/${id}/categories`;
+    return this.http.get(url)
+      .toPromise()
+      .then(response => response.json())
+      .catch(this.handleError);
+  }
+
+  addCategories(id: number, categories: Category[]) {
+    // TODO
+  }
+
+  deleteCategories(id: number, categories: Category[]) {
+    //TODO
+  }
+
+  getPosts(id: number): Promise<Post[]> {
+    let url = `${this.urlBase}/${id}/posts`;
     return this.http.get(url)
       .toPromise()
       .then(response => response.json())

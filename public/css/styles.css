@@ -1,12 +1,10 @@
-.alignleft {
+.align-left {
 	float: left;
 }
-.alignright {
+.align-right {
 	float: right;
 }
-.message-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+.left-right-container {
+	clear: both;
+	overflow: auto;
 }

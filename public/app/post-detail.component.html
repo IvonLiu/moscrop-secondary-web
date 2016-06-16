@@ -1,0 +1,15 @@
+<div class="container" *ngIf="post">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div>
+        <p>Title: {{post.title}}</p>
+        <p>Created at: {{getFormattedDate()}} by {{post.authorInfo.first_name}} {{post.authorInfo.last_name}} in {{post.categoryName}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="fr-view" [innerHTML]="post.content"></div>
+    </div>
+  </div>
+</div>

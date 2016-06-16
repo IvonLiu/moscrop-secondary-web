@@ -20,7 +20,7 @@ router.get('/:id', function(req, res, next) {
 });
 
 router.post('/', jwt.auth, function(req, res, next) {
-
+  console.log('Trying to submit post from user id=' + req.payload.id);
   db.get().query('SELECT categories FROM users WHERE id="' + req.payload.id + '"', function(err, rows) {
 
     if (err) return utils.error(res, err);
@@ -32,10 +32,14 @@ router.post('/', jwt.auth, function(req, res, next) {
       var o = req.body[i];
       // Verify all fields are present
       if (!o.title || !o.content || !o.category) {
+        console.log('Detected item that is missing field');
         continue;
       }
       // Verify user belongs to the category they are posting to
-      if (rows[0].categories.split(',').indexOf(o.category) == -1) {
+      console.log(rows[0].categories.split(','));
+      console.log(rows[0].categories.split(',').length);
+      if (rows[0].categories.split(',').indexOf('' + o.category) == -1) { // TODO make rows.categories split into number
+        console.log('Skipping item because category mismatch');
         continue;
       }
       // Extract only the fields that are needed
@@ -47,6 +51,8 @@ router.post('/', jwt.auth, function(req, res, next) {
       };
       verified.push(v);
     }
+
+    console.log('Adding ' + verified.length + ' posts to database');
 
     // Write to database
     db.fixtures.create({

@@ -1,4 +1,9 @@
-<button (click)="saveToken()">saveToken()</button>
-<button (click)="getToken()">getToken()</button>
-<button (click)="currentUserId()">currentUserId()</button>
-<button (click)="logOut()">logOut()</button>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <ul class="list-group">
+        <category *ngFor="let category of categories" [category]="category" (onCategoryAction)="categoryClicked($event)"></category>
+      </ul>
+    </div>
+  </div>
+</div>

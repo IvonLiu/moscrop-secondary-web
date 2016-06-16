@@ -1,1 +1,3 @@
-<li class="list-group-item">{{post.title}} | {{getFormattedDate()}} | {{post.categoryName}} | {{post.authorInfo.first_name}} {{ post.authorInfo.last_name}}</li>
+<li class="list-group-item">
+  <a (click)="showDetails()">{{post.title}} | {{getFormattedDate()}} | {{post.categoryName}} | {{post.authorInfo.first_name}} {{ post.authorInfo.last_name}}</a>
+</li>

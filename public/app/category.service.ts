@@ -4,6 +4,7 @@ import { Headers, Http } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 
 import { Category } from './category';
+import { Post } from './post';
 
 @Injectable()
 export class CategoryService {
@@ -21,6 +22,14 @@ export class CategoryService {
 
   getCategory(id: number): Promise<Category> {
     let url = `${this.urlBase}/${id}`;
+    return this.http.get(url)
+      .toPromise()
+      .then(response => response.json())
+      .catch(this.handleError);
+  }
+
+  getPosts(id: number): Promise<Post[]> {
+    let url = `${this.urlBase}/${id}/posts`;
     return this.http.get(url)
       .toPromise()
       .then(response => response.json())

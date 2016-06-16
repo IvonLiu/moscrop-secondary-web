@@ -15,28 +15,45 @@ import { CategoryService } from './category.service';
 })
 export class PostListComponent implements OnInit {
 
+  categories: Category[];
+  currentCategory: Category;
+
   posts: Post[];
 
   constructor(
     private postService: PostService,
     private userService: UserService,
     private categoryService: CategoryService
-  ) {}
+  ) {
+    this.currentCategory = null;
+  }
 
   ngOnInit() {
+    this.getCategoryList();
     this.getPostList();
+  }
+
+  changeCategory(category: Category) {
+    this.currentCategory = category;
+    this.getPostList();
+  }
+
+  private getCategoryList() {
+    this.categoryService
+      .getCategories()
+      .then((categories) => this.categories = categories)
+      .catch(error => console.error(error));
   }
 
   private getPostList() {
     var temp: Post[] = [];
-    this.postService
-      .getPosts()
+    (this.currentCategory ? this.categoryService.getPosts(this.currentCategory.id) : this.postService.getPosts())
       .then((posts) => temp = posts)
       .then(() => {
         var fetchCategories = temp.map((post) => this.categoryService.getCategory(post.category));
         return Promise.all(fetchCategories);
       })
-      .then((categories) => {
+      .then((categories: Category[]) => {
         for (var i=0; i<temp.length; i++) {
           temp[i].categoryName = categories[i].name;
         }
@@ -45,13 +62,12 @@ export class PostListComponent implements OnInit {
         var fetchUsers = temp.map((post) => this.userService.getUser(post.author));
         return Promise.all(fetchUsers);
       })
-      .then((users) => {
+      .then((users: User[]) => {
         for (var i=0; i<temp.length; i++) {
           temp[i].authorInfo = users[i];
         }
       })
       .then(() => this.posts = temp)
-      .then(() => console.log(this.posts))
       .catch(error => console.error(error));
   }
 

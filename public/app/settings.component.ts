@@ -1,29 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
+import { Category } from './category';
+import { CategoryComponent } from './category.component';
 import { UserService } from './user.service';
 
 @Component({
   selector: 'settings',
+  directives: [CategoryComponent],
   templateUrl: 'app/settings.component.html'
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
 
-  constructor(private userService: UserService) {}
+  currentUserId: number;
+  categories: Category[];
 
-  saveToken() {
-    this.userService.saveToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNDY1NjA5MzMwfQ.ibT_XKrAhXkAV561_QYZgpAbU5YEbp42r2Cul-6lPaM');
+  constructor(private userService: UserService) {
+    this.currentUserId = this.userService.currentUserId();
   }
 
-  getToken() {
-    console.log('Token:', this.userService.getToken());
+  ngOnInit() {
+    this.getUserCategories();
   }
 
-  currentUserId() {
-    console.log('User ID:', this.userService.currentUserId());
+  private getUserCategories() {
+    this.userService
+      .getCategories(this.currentUserId)
+      .then((categories) => this.categories = categories)
+      .catch(error => console.error(error));
   }
 
-  logOut() {
-    this.userService.logOut();
+  private categoryClicked(category: Category) {
+    console.log('clicked: ' + category.name);
   }
 
 }
