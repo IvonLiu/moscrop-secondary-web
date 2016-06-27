@@ -32,7 +32,17 @@ export class SubmitComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    $(this.content.nativeElement).froalaEditor();
+    $(this.content.nativeElement).froalaEditor({
+      imageUploadParam: 'foo_bar_test_upload',
+      imageUploadURL: 'http://localhost:3000/api/uploads/images',
+      imageUploadParams: {test_param: 'this is a test'},
+      imageMaxSize: 5 * 1024 * 1024,
+      imageAllowedTypes: ['jpeg', 'jpg', 'png'],
+      requestWithCORS: false
+    })
+    .on('froalaEditor.image.error', function(e, editor, error, response) {
+      console.log(error);
+    });
   }
 
   private getUserCategories() {
